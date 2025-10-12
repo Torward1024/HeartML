@@ -58,13 +58,8 @@ class BaseModel(ABC):
                 raise ValueError("Invalid data!")
         
             # perform data preprocessing
-            print("Proceeding with data processing")
             processed_data = self._preprocess_features(data)
-            print("Data processed successfully")
-        
-            print("Proceeding with prediction")
             pred = self.model.predict(processed_data)
-            print("Proceeding with prediction of probability")
             proba = self.model.predict_proba(processed_data)
             
             print("Success!")

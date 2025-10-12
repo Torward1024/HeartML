@@ -52,7 +52,6 @@ class HeartModel(BaseModel):
             raise ValueError(f"Missing required features: {missing}")
         
         if self.data_for_prediction.isna().any().any():
-            print("Found NaN values in input data. Filling NaNs...")
             # numeric columns: fill with median
             numeric_cols = self.data_for_prediction.select_dtypes(include=['float64', 'int64']).columns
             self.data_for_prediction[numeric_cols] = \
@@ -68,7 +67,6 @@ class HeartModel(BaseModel):
     def _preprocess_features(self, data: pd.DataFrame) -> pd.DataFrame:
         """Method to preprocess data according to the requirements achieved in the research."""
         data = data.copy()
-        print("Proceeding with feature preparation")
         thresholds = self.metadata.get('grouped_features_tresholds', {})
         feature_groups = self.metadata.get('features_groups', {})
         
@@ -129,12 +127,7 @@ class HeartModel(BaseModel):
         return data[final_features]
     
     def _format_output(self, prediction, probability) -> pd.DataFrame:
-        """Prepare the data for output"""
-        print("Proceeding with prediction output")
-        print(f"Type of ids: {type(self.ids)}, Sample: {self.ids[:5]}")
-        print(f"Type of prediction: {type(prediction)}, Sample: {prediction[:5]}")
-        print(f"Type of probability: {type(probability)}, Sample: {probability[:5]}")
-        
+        """Prepare the data for output"""        
         if hasattr(probability, 'shape') and len(probability.shape) > 1:
             probability = probability[:, 1]
         

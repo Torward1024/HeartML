@@ -1,60 +1,90 @@
 # /heart_model.py
 
 from base_model import BaseModel
+import re
 import pandas as pd
 
 class HeartModel(BaseModel):
-    """Конкретная модель для предсказания риска сердечного приступа"""
+    """Model to predict heart attack risk binary."""
     
     def __init__(self, model_path: str):
         super().__init__(model_path)
         self.required_features = None
+
+    def _to_snake_case(self, name: str):
+        """Method to rename columns in DataFrame"""
+        name = re.sub(r'[\s\-()]', '_', name)
+        name = re.sub(r'([a-z])([A-Z])', r'\1_\2', name)
+        name = name.lower()
+        name = re.sub(r'_+', '_', name)
+        return name.strip('_')
         
     def _validate_input(self, data: pd.DataFrame) -> bool:
-        """Проверяет наличие всех необходимых исходных признаков"""
+        """Validate data before prediction"""
         if not self.is_loaded:
             self.load_model()
+
+        # rename columns
+        data.columns = [self._to_snake_case(col) for col in data.columns]
+
+        if 'id' not in data.columns:
+            raise ValueError("CSV must contain 'id' column")
+        
+        self.ids = data['id']
+        self.data_for_prediction = data.drop('id', axis=1)
             
-        # Получаем все исходные признаки из групп
+        # get required features from model metadata
         all_required = set()
         feature_groups = self.metadata.get('features_groups', {})
         for group_features in feature_groups.values():
             all_required.update(group_features)
         
-        # Добавляем обязательные отдельные признаки
+        # add additional individual features
         individual_features = ['heart_rate', 'family_history', 'diet', 
                               'systolic_blood_pressure', 'diastolic_blood_pressure']
         all_required.update(individual_features)
         
         self.required_features = list(all_required)
         
-        # Проверяем наличие всех признаков
+        # check all features
         missing = set(self.required_features) - set(data.columns)
         if missing:
-            raise ValueError(f"❌ Отсутствуют обязательные признаки: {missing}")
+            raise ValueError(f"Missing required features: {missing}")
+        
+        if self.data_for_prediction.isna().any().any():
+            print("Found NaN values in input data. Filling NaNs...")
+            # numeric columns: fill with median
+            numeric_cols = self.data_for_prediction.select_dtypes(include=['float64', 'int64']).columns
+            self.data_for_prediction[numeric_cols] = \
+            self.data_for_prediction[numeric_cols].fillna(self.data_for_prediction[numeric_cols].median())
+            
+            # сategorical columns: fill with a default value 'unknown'
+            categorical_cols = self.data_for_prediction.select_dtypes(include=['object']).columns
+            self.data_for_prediction[categorical_cols] = \
+            self.data_for_prediction[categorical_cols].fillna('unknown')
         
         return True
     
     def _preprocess_features(self, data: pd.DataFrame) -> pd.DataFrame:
-        """Повторяет логику группировки признаков как при обучении"""
-        df = data.copy()
-        
-        # Получаем пороги из метаданных
+        """Method to preprocess data according to the requirements achieved in the research."""
+        data = data.copy()
+        print("Proceeding with feature preparation")
         thresholds = self.metadata.get('grouped_features_tresholds', {})
         feature_groups = self.metadata.get('features_groups', {})
         
-        # 1. Создаем antrophometric_score
+        # grouped feature `antrophometric_score`
+        print("Proceeding with antrophometric_score")
         if 'antrophometric_score' in feature_groups:
             bmi_thresh = thresholds.get('bmi', 0.5)
             age_thresh = thresholds.get('age', 0.4)
             
-            df['antrophometric_score'] = (
-                (df['bmi'] > bmi_thresh).astype(int) +
-                df['obesity'] +
-                (df['age'] > age_thresh).astype(int)
+            data['antrophometric_score'] = (
+                (data['bmi'] > bmi_thresh).astype(int) +
+                data['obesity'] +
+                (data['age'] > age_thresh).astype(int)
             )
-        
-        # 2. Создаем lifestyle_score
+        print("Proceeding with lifestyle_score")
+        # grouped feature `lifestyle_score`
         if 'lifestyle_score' in feature_groups:
             stress_thresh = thresholds.get('stress_level', 7)
             ex_thresh = thresholds.get('exercise_hours_per_week', 0.5)
@@ -62,73 +92,54 @@ class HeartModel(BaseModel):
             phys_thresh = thresholds.get('physical_activity_days_per_week', 3)
             sleep_thresh = thresholds.get('sleep_hours_per_day', 0.33)
             
-            df['lifestyle_score'] = (
-                df['smoking'] +
-                (df['stress_level'] > stress_thresh).astype(int) +
-                df['alcohol_consumption'] +
-                (df['exercise_hours_per_week'] < ex_thresh).astype(int) +
-                (df['sedentary_hours_per_day'] > sed_thresh).astype(int) +
-                (df['physical_activity_days_per_week'] < phys_thresh).astype(int) +
-                (df['sleep_hours_per_day'] < sleep_thresh).astype(int)
+            data['lifestyle_score'] = (
+                data['smoking'] +
+                (data['stress_level'] > stress_thresh).astype(int) +
+                data['alcohol_consumption'] +
+                (data['exercise_hours_per_week'] < ex_thresh).astype(int) +
+                (data['sedentary_hours_per_day'] > sed_thresh).astype(int) +
+                (data['physical_activity_days_per_week'] < phys_thresh).astype(int) +
+                (data['sleep_hours_per_day'] < sleep_thresh).astype(int)
             )
         
-        # 3. Создаем test_score
+        # grouped feature `test_score`
+        print("Proceeding with test_score")
         if 'test_score' in feature_groups:
             chol_thresh = thresholds.get('cholesterol', 0.5)
             trig_thresh = thresholds.get('triglycerides', 0.5)
             sugar_thresh = thresholds.get('blood_sugar', 0.17)
             
-            df['test_score'] = (
-                (df['cholesterol'] > chol_thresh).astype(int) + 
-                (df['triglycerides'] > trig_thresh).astype(int) + 
-                (df['blood_sugar'] > sugar_thresh).astype(int)
+            data['test_score'] = (
+                (data['cholesterol'] > chol_thresh).astype(int) + 
+                (data['triglycerides'] > trig_thresh).astype(int) + 
+                (data['blood_sugar'] > sugar_thresh).astype(int)
             )
         
-        # 4. Создаем medical_score
+        # grouped feature `medical_score`
+        print("Proceeding with medical_score")
         if 'medical_score' in feature_groups:
-            df['medical_score'] = (
-                df['medication_use'] +
-                df['diabetes'] +
-                df['previous_heart_problems']
+            data['medical_score'] = (
+                data['medication_use'] +
+                data['diabetes'] +
+                data['previous_heart_problems']
             )
         
-        # 5. Выбираем только финальные признаки для модели
+        # 
         final_features = self.metadata.get('feature_names', [])
-        return df[final_features]
+        return data[final_features]
     
-    def predict(self, csv_file_path: str) -> pd.DataFrame:
-        """Предсказание для батча данных из CSV файла"""
-        if not self.is_loaded:
-            self.load_model()
+    def _format_output(self, prediction, probability) -> pd.DataFrame:
+        """Prepare the data for output"""
+        print("Proceeding with prediction output")
+        print(f"Type of ids: {type(self.ids)}, Sample: {self.ids[:5]}")
+        print(f"Type of prediction: {type(prediction)}, Sample: {prediction[:5]}")
+        print(f"Type of probability: {type(probability)}, Sample: {probability[:5]}")
         
-        # Читаем CSV
-        data = pd.read_csv(csv_file_path)
+        if hasattr(probability, 'shape') and len(probability.shape) > 1:
+            probability = probability[:, 1]
         
-        # Сохраняем ID
-        if 'id' not in data.columns:
-            raise ValueError("❌ CSV файл должен содержать столбец 'id'")
-        
-        ids = data['id']
-        
-        # Удаляем ID из данных для предсказания
-        data_for_prediction = data.drop('id', axis=1)
-        
-        # Валидация и препроцессинг
-        self._validate_input(data_for_prediction)
-        processed_data = self._preprocess_features(data_for_prediction)
-        
-        # Предсказание
-        predictions = self.model.predict(processed_data)
-        
-        # Собираем результат
         result = pd.DataFrame({
-            'id': ids,
-            'prediction': predictions
+            'id': self.ids,
+            'prediction': prediction
         })
-        
         return result
-    
-    def save_predictions(self, predictions_df: pd.DataFrame, output_path: str):
-        """Сохраняет предсказания в CSV файл"""
-        predictions_df.to_csv(output_path, index=False)
-        print(f"✅ Предсказания сохранены в {output_path}")

@@ -14,7 +14,7 @@ class BaseModel(ABC):
         self.is_loaded = False
         
     def load_model(self):
-        """Загружает модель с метаданными"""
+        """Load model & metadata"""
         try:
             model_data = joblib.load(self.model_path)
             self.model = model_data['model']              # get model itself

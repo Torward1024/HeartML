@@ -7,7 +7,7 @@ import logging
 
 app = FastAPI()
 
-app.mount("/tmp", StaticFiles(directory="tmp"), name='data')
+app.mount("/output", StaticFiles(directory="output"), name='data')
 
 app_logger = logging.getLogger(__name__)
 app_logger.setLevel(logging.INFO)
@@ -16,14 +16,13 @@ app_formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)
 app_handler.setFormatter(app_formatter)
 app_logger.addHandler(app_handler)
 
-
 @app.get("/health")
 def health():
     return {"status": "OK"}
 
 @app.post("/predict")
 def perform_prediction(file: UploadFile, request: Request):
-    save_pth = "tmp/" + file.filename
+    save_pth = "output/" + file.filename
     app_logger.info(f'processing file - {save_pth}')
     with open(save_pth, "wb") as fid:
         fid.write(file.file.read())

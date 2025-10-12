@@ -40,26 +40,30 @@ class BaseModel(ABC):
     
     def predict(self, input_data: Union[dict, pd.DataFrame]) -> dict:
         """Основной метод для предсказания"""
-        if not self.is_loaded:
-            self.load_model()
+        try:
+            if not self.is_loaded:
+                self.load_model()
         
-        # convert dict ot pandas df
-        if isinstance(input_data, dict):
-            data = pd.DataFrame([input_data])
-        else:
-            data = input_data.copy()
+            # convert dict ot pandas df
+            if isinstance(input_data, dict):
+                data = pd.DataFrame([input_data])
+            else:
+                data = input_data.copy()
         
-        # need to validate data
-        if not self._validate_input(data):
-            raise ValueError("Invalid data!")
+            # need to validate data
+            if not self._validate_input(data):
+                raise ValueError("Invalid data!")
         
-        # perform data preprocessing
-        processed_data = self._preprocess_features(data)
+            # perform data preprocessing
+            processed_data = self._preprocess_features(data)
         
-        pred = self.model.predict(processed_data)
-        proba = self.model.predict_proba(processed_data)
-        
-        return self._format_output(pred, proba)
+            pred = self.model.predict(processed_data)
+            proba = self.model.predict_proba(processed_data)
+            status = 'OK'
+            return status, self._format_output(pred, proba)
+        except:
+            status = 'Failed'
+            return status, {}
     
     @abstractmethod
     def _preprocess_features(self, data: pd.DataFrame) -> pd.DataFrame:

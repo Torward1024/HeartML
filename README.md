@@ -91,22 +91,18 @@ HeartML/\
 ## 📜 Инструкция по запуску
 1. **Установите зависимости**:
    Установите зависимости из `requirements.txt`:
-   ```bash
-   pip install -r requirements.txt
+   ```bash pip install -r requirements.txt```
 
 2. **Запустите приложение**:
-    ```bash
     В командной строке перейдите в папку проекта:
-    cd path/to/HeartML
+    ```bash cd path/to/HeartML```
 
     Запустите FastAPI сервер:
-    ```bash
-    python heartml_app.py --host localhost --port 8000
+    ```bash python heartml_app.py --host localhost --port 8000```
 
  3. **Выполните предсказание**:
     Отправьте тестовый CSV-файл на эндпоинт /predict:
-    ```bash
-    curl -X POST "http://localhost:8000/predict" -F "file=@data/heart_test.csv"
+    ```bash curl -X POST "http://localhost:8000/predict" -F "file=@data/heart_test.csv"```
 
     Успешная обработка запроса вернёт JSON-ответ:
     ```json
@@ -114,15 +110,14 @@ HeartML/\
     "status": "success",
     "message": "Predictions saved to output/result.csv",
     "predictions_count": <число_записей>
-    }
+    }```
 
 4. **Проверьте результаты**:
-Используйте скрипт `test.py` для сравнения предсказаний с правильными ответами:
-    ```bash
-    python test.py --student output/result.csv --correct data/correct_answers.csv
+   Используйте скрипт `test.py` для сравнения предсказаний с правильными ответами:
+    ```bash python test.py --student output/result.csv --correct data/correct_answers.csv```
 
-Скрипт выведет `classification_report` с метриками (precision, recall, f1-score, support).
-Примечание: Убедитесь, что `correct_answers.csv` содержит столбцы **[id, prediction]** и имеет то же количество строк, что и result.csv.
+   Скрипт выведет `classification_report` с метриками (precision, recall, f1-score, support).
+   Примечание: Убедитесь, что `correct_answers.csv` содержит столбцы **[id, prediction]** и имеет то же количество строк, что и result.csv.
 
 ## 📞 Контакты
 - Автор: Алексей Рудницкий

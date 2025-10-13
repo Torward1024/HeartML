@@ -1,6 +1,7 @@
 # /heart_model.py
 
 from base_model import BaseModel
+from typing import Union
 import re
 import pandas as pd
 
@@ -50,6 +51,17 @@ class HeartModel(BaseModel):
         missing = set(self.required_features) - set(data.columns)
         if missing:
             raise ValueError(f"Missing required features: {missing}")
+        
+        if self.data_for_prediction.isna().any().any():
+            # numeric columns -- fill with median
+            numeric_cols = self.data_for_prediction.select_dtypes(include=['float64', 'int64']).columns
+            self.data_for_prediction[numeric_cols] = \
+            self.data_for_prediction[numeric_cols].fillna(self.data_for_prediction[numeric_cols].median())
+            
+            # сategorical columns -- fill with a default value 'unknown'
+            categorical_cols = self.data_for_prediction.select_dtypes(include=['object']).columns
+            self.data_for_prediction[categorical_cols] = \
+            self.data_for_prediction[categorical_cols].fillna('unknown')
         
         return True
     
@@ -129,3 +141,30 @@ class HeartModel(BaseModel):
             'prediction': prediction
         })
         return result
+    
+    def predict(self, input_data: Union[dict, pd.DataFrame]) -> dict:
+        """Predict heart attack risk with custom threshold -- overloaded from BaseModel"""
+        try:
+            if not self.is_loaded:
+                self.load_model()
+        
+            # convert dict to pandas df
+            if isinstance(input_data, dict):
+                data = pd.DataFrame([input_data])
+            else:
+                data = input_data.copy()
+        
+            # validate data
+            if not self._validate_input(data):
+                raise ValueError("Invalid data!")
+        
+            # perform data preprocessing
+            processed_data = self._preprocess_features(data)
+
+            # get probabilities and apply custom threshold
+            proba = self.model.predict_proba(processed_data)[:, 1]
+            threshold = self.metadata.get('threshold', 0.25)
+            pred = (proba > threshold).astype(int)
+            return 'success', self._format_output(pred, proba)
+        except Exception as e:
+            return 'error', str(e)

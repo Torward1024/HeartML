@@ -1,18 +1,18 @@
 # 🚀 Прогнозирование риска сердечного приступа
-<image-card alt="Python" src="https://img.shields.io/badge/Python-3.12%2B-blue" ></image-card>
-<image-card alt="Pandas" src="https://img.shields.io/badge/Pandas-2.2.3-orange" ></image-card>
-<image-card alt="NumPy" src="https://img.shields.io/badge/NumPy-2.2.2-green" ></image-card>
-<image-card alt="Phik" src="https://img.shields.io/badge/Phik-0.12.4-purple" ></image-card>
-<image-card alt="Joblib" src="https://img.shields.io/badge/Joblib-1.4.2-lightgrey" ></image-card>
-<image-card alt="Matplotlib" src="https://img.shields.io/badge/Matplotlib-3.10.0-red" ></image-card>
-<image-card alt="Seaborn" src="https://img.shields.io/badge/Seaborn-0.13.2-lightgrey" ></image-card>
-<image-card alt="Scikit-learn" src="https://img.shields.io/badge/Scikit--learn-1.6.1-yellow" ></image-card>
-<image-card alt="Imbalanced-learn" src="https://img.shields.io/badge/Imbalanced--learn-0.14.0-orange" ></image-card>
-<image-card alt="XGBoost" src="https://img.shields.io/badge/XGBoost-3.0.5-green" ></image-card>
-<image-card alt="CatBoost" src="https://img.shields.io/badge/CatBoost-1.2.8-purple" ></image-card>
-<image-card alt="SHAP" src="https://img.shields.io/badge/SHAP-0.48.0-blue" ></image-card>
-<image-card alt="FastAPI" src="https://img.shields.io/badge/FastAPI-0.119.0-red" ></image-card>
-<image-card alt="Uvicorn" src="https://img.shields.io/badge/Uvicorn-0.37.0-lightgrey" ></image-card>
+![Python](https://img.shields.io/badge/Python-3.12%2B-blue)
+![Pandas](https://img.shields.io/badge/Pandas-2.2%2B-orange)
+![NumPy](https://img.shields.io/badge/NumPy-2.2%2B-green)
+![Phik](https://img.shields.io/badge/Phik-0.12%2B-purple)
+![Joblib](https://img.shields.io/badge/Joblib-1.4%2B-purple)
+![Matplotlib](https://img.shields.io/badge/Matplotlib-3.10%2B-red)
+![Seaborn](https://img.shields.io/badge/Seaborn-0.13%2B-lightgrey)
+![Scikit-learn](https://img.shields.io/badge/Scikit--learn-1.6%2B-yellow)
+![Imbalanced-learn](https://img.shields.io/badge/Imbalanced--learn-0.14%2B-orange)
+![XGBoost](https://img.shields.io/badge/XGBoost-3.0%2B-green)
+![CatBoost](https://img.shields.io/badge/CatBoost-1.2%2B-purple)
+![SHAP](https://img.shields.io/badge/SHAP-0.48%2B-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.119%2B-red)
+![Uvicorn](https://img.shields.io/badge/Uvicorn-0.37%2B-lightgrey)
 
 ## 🎯 Цель проекта
 Разработать модель машинного обучения для бинарной классификации риска сердечного приступа на основе медицинских и антропометрических данных с использованием градиентного бустинга.
@@ -66,17 +66,17 @@
 - **Другие**: Jupyter Notebook, VSCode, Git
 
 ## 📂 Структура проекта
-HeartML/
-├── data/                       # Папка с исходными данными (в репозитории не представлена)
-│   
-├── model/
-│   └── model_complete.pkl      # Сохранённая модель и метаданные
-├── output/
-│   └── result.csv              # Результаты предсказаний
-├── heart_model.py              # Класс модели
-├── base_model.py               # Базовый класс модели
-├── heartml_app.py              # FastAPI приложение
-├── test.py                     # Скрипт тестирования
+HeartML/\
+├── data/                       # Папка с исходными данными (в репозитории не представлена)\
+│   \
+├── model/\
+│   └── model_complete.pkl      # Сохранённая модель и метаданные\
+├── output/\
+│   └── result.csv              # Результаты предсказаний\
+├── heart_model.py              # Класс модели\
+├── base_model.py               # Базовый класс модели\
+├── heartml_app.py              # FastAPI приложение\
+├── test.py                     # Скрипт тестирования\
 └── README.md                   # Этот файл
 
 ## 🏆 Ключевые метрики

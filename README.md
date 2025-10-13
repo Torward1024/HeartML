@@ -94,18 +94,18 @@ HeartML/\
    ```bash pip install -r requirements.txt```
 
 2. **Запустите приложение**:
-    В командной строке перейдите в папку проекта:
-    ```bash cd path/to/HeartML```
+    В командной строке перейдите в папку проекта:\
+    ```cd path/to/HeartML```
 
-    Запустите FastAPI сервер:
-    ```bash python heartml_app.py --host localhost --port 8000```
+    Запустите FastAPI сервер:\
+    ```python heartml_app.py --host localhost --port 8000```
 
  3. **Выполните предсказание**:
-    Отправьте тестовый CSV-файл на эндпоинт /predict:
-    ```bash curl -X POST "http://localhost:8000/predict" -F "file=@data/heart_test.csv"```
+    Отправьте тестовый CSV-файл на эндпоинт `/predict`:\
+    ```curl -X POST "http://localhost:8000/predict" -F "file=@data/heart_test.csv"```\
 
-    Успешная обработка запроса вернёт JSON-ответ:
-    ```json
+    Успешная обработка запроса вернёт JSON-ответ:\
+    ```
     {
     "status": "success",
     "message": "Predictions saved to output/result.csv",

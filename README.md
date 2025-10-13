@@ -104,13 +104,13 @@ HeartML/\
     Отправьте тестовый CSV-файл на эндпоинт `/predict`:\
     ```curl -X POST "http://localhost:8000/predict" -F "file=@data/heart_test.csv"```\
 
-    Успешная обработка запроса вернёт JSON-ответ:\
+    Успешная обработка запроса вернёт JSON-ответ:
     ```
     {
     "status": "success",
     "message": "Predictions saved to output/result.csv",
     "predictions_count": <число_записей>
-    }```
+    }
 
 4. **Проверьте результаты**:
    Используйте скрипт `test.py` для сравнения предсказаний с правильными ответами:

@@ -10,7 +10,8 @@ class HeartModel(BaseModel):
     
     def __init__(self, model_path: str):
         super().__init__(model_path)
-        self.required_features = None
+        self.load_model()
+        self.threshold = self.metadata.get('threshold', 0.25)
 
     def _to_snake_case(self, name: str):
         """Method to rename columns in DataFrame"""
@@ -76,7 +77,6 @@ class HeartModel(BaseModel):
             raise ValueError("Metadata must contain 'grouped_features_tresholds'")
         
         # grouped feature `antrophometric_score`
-        print("Proceeding with antrophometric_score")
         if 'antrophometric_score' in feature_groups:
             bmi_thresh = thresholds.get('bmi', 0.5)
             age_thresh = thresholds.get('age', 0.4)
@@ -86,7 +86,6 @@ class HeartModel(BaseModel):
                 data['obesity'] +
                 (data['age'] > age_thresh).astype(int)
             )
-        print("Proceeding with lifestyle_score")
         # grouped feature `lifestyle_score`
         if 'lifestyle_score' in feature_groups:
             stress_thresh = thresholds.get('stress_level', 7)
@@ -106,7 +105,6 @@ class HeartModel(BaseModel):
             )
         
         # grouped feature `test_score`
-        print("Proceeding with test_score")
         if 'test_score' in feature_groups:
             chol_thresh = thresholds.get('cholesterol', 0.5)
             trig_thresh = thresholds.get('triglycerides', 0.5)
@@ -119,7 +117,6 @@ class HeartModel(BaseModel):
             )
         
         # grouped feature `medical_score`
-        print("Proceeding with medical_score")
         if 'medical_score' in feature_groups:
             data['medical_score'] = (
                 data['medication_use'] +
@@ -142,6 +139,15 @@ class HeartModel(BaseModel):
         })
         return result
     
+    def get_treshold(self) -> float:
+        """Get the treshold from model"""
+        return self.threshold
+    
+    def set_treshold(self, threshold: int) -> float:
+        """Sets new treshold to the model"""
+        self.threshold = threshold
+        return self.threshold
+    
     def predict(self, input_data: Union[dict, pd.DataFrame]) -> dict:
         """Predict heart attack risk with custom threshold -- overloaded from BaseModel"""
         try:
@@ -163,8 +169,7 @@ class HeartModel(BaseModel):
 
             # get probabilities and apply custom threshold
             proba = self.model.predict_proba(processed_data)[:, 1]
-            threshold = self.metadata.get('threshold', 0.25)
-            pred = (proba > threshold).astype(int)
+            pred = (proba > self.threshold).astype(int)
             return 'success', self._format_output(pred, proba)
         except Exception as e:
             return 'error', str(e)

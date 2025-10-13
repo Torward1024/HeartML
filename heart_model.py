@@ -51,17 +51,6 @@ class HeartModel(BaseModel):
         if missing:
             raise ValueError(f"Missing required features: {missing}")
         
-        if self.data_for_prediction.isna().any().any():
-            # numeric columns: fill with median
-            numeric_cols = self.data_for_prediction.select_dtypes(include=['float64', 'int64']).columns
-            self.data_for_prediction[numeric_cols] = \
-            self.data_for_prediction[numeric_cols].fillna(self.data_for_prediction[numeric_cols].median())
-            
-            # сategorical columns: fill with a default value 'unknown'
-            categorical_cols = self.data_for_prediction.select_dtypes(include=['object']).columns
-            self.data_for_prediction[categorical_cols] = \
-            self.data_for_prediction[categorical_cols].fillna('unknown')
-        
         return True
     
     def _preprocess_features(self, data: pd.DataFrame) -> pd.DataFrame:
@@ -69,6 +58,10 @@ class HeartModel(BaseModel):
         data = data.copy()
         thresholds = self.metadata.get('grouped_features_tresholds', {})
         feature_groups = self.metadata.get('features_groups', {})
+        if not feature_groups:
+            raise ValueError("Metadata must contain 'features_groups'")
+        if not thresholds:
+            raise ValueError("Metadata must contain 'grouped_features_tresholds'")
         
         # grouped feature `antrophometric_score`
         print("Proceeding with antrophometric_score")

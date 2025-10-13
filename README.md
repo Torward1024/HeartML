@@ -1,11 +1,18 @@
 # 🚀 Прогнозирование риска сердечного приступа
-![Python](https://img.shields.io/badge/Python-3.9%2B-blue)
-![Pandas](https://img.shields.io/badge/Pandas-1.3%2B-orange)
-![NumPy](https://img.shields.io/badge/NumPy-1.21%2B-green)
-![Scikit-learn](https://img.shields.io/badge/Scikit--learn-1.0%2B-yellow)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.68%2B-red)
-![Uvicorn](https://img.shields.io/badge/Uvicorn-0.15%2B-lightgrey)
-![Joblib](https://img.shields.io/badge/Joblib-1.0%2B-purple)
+<image-card alt="Python" src="https://img.shields.io/badge/Python-3.12%2B-blue" ></image-card>
+<image-card alt="Pandas" src="https://img.shields.io/badge/Pandas-2.2.3-orange" ></image-card>
+<image-card alt="NumPy" src="https://img.shields.io/badge/NumPy-2.2.2-green" ></image-card>
+<image-card alt="Phik" src="https://img.shields.io/badge/Phik-0.12.4-purple" ></image-card>
+<image-card alt="Joblib" src="https://img.shields.io/badge/Joblib-1.4.2-lightgrey" ></image-card>
+<image-card alt="Matplotlib" src="https://img.shields.io/badge/Matplotlib-3.10.0-red" ></image-card>
+<image-card alt="Seaborn" src="https://img.shields.io/badge/Seaborn-0.13.2-lightgrey" ></image-card>
+<image-card alt="Scikit-learn" src="https://img.shields.io/badge/Scikit--learn-1.6.1-yellow" ></image-card>
+<image-card alt="Imbalanced-learn" src="https://img.shields.io/badge/Imbalanced--learn-0.14.0-orange" ></image-card>
+<image-card alt="XGBoost" src="https://img.shields.io/badge/XGBoost-3.0.5-green" ></image-card>
+<image-card alt="CatBoost" src="https://img.shields.io/badge/CatBoost-1.2.8-purple" ></image-card>
+<image-card alt="SHAP" src="https://img.shields.io/badge/SHAP-0.48.0-blue" ></image-card>
+<image-card alt="FastAPI" src="https://img.shields.io/badge/FastAPI-0.119.0-red" ></image-card>
+<image-card alt="Uvicorn" src="https://img.shields.io/badge/Uvicorn-0.37.0-lightgrey" ></image-card>
 
 ## 🎯 Цель проекта
 Разработать модель машинного обучения для бинарной классификации риска сердечного приступа на основе медицинских и антропометрических данных с использованием градиентного бустинга.
@@ -83,9 +90,10 @@ HeartML/
 
 ## 📜 Инструкция по запуску
 1. **Установите зависимости**:
-   Убедитесь, что Python 3.9+ установлен. Установите необходимые библиотеки:
+   Установите зависимости из `requirements.txt`:
    ```bash
-   pip install pandas numpy scikit-learn fastapi uvicorn joblib
+   pip install -r requirements.txt
+
 2. **Запустите приложение**:
     ```bash
     В командной строке перейдите в папку проекта:

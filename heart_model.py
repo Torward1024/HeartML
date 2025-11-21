@@ -1,6 +1,7 @@
 # /heart_model.py
 
 from base_model import BaseModel
+from typing import Union
 import re
 import pandas as pd
 
@@ -9,7 +10,8 @@ class HeartModel(BaseModel):
     
     def __init__(self, model_path: str):
         super().__init__(model_path)
-        self.required_features = None
+        self.load_model()
+        self.threshold = self.metadata.get('threshold', 0.25)
 
     def _to_snake_case(self, name: str):
         """Method to rename columns in DataFrame"""
@@ -52,12 +54,12 @@ class HeartModel(BaseModel):
             raise ValueError(f"Missing required features: {missing}")
         
         if self.data_for_prediction.isna().any().any():
-            # numeric columns: fill with median
+            # numeric columns -- fill with median
             numeric_cols = self.data_for_prediction.select_dtypes(include=['float64', 'int64']).columns
             self.data_for_prediction[numeric_cols] = \
             self.data_for_prediction[numeric_cols].fillna(self.data_for_prediction[numeric_cols].median())
             
-            # сategorical columns: fill with a default value 'unknown'
+            # сategorical columns -- fill with a default value 'unknown'
             categorical_cols = self.data_for_prediction.select_dtypes(include=['object']).columns
             self.data_for_prediction[categorical_cols] = \
             self.data_for_prediction[categorical_cols].fillna('unknown')
@@ -69,9 +71,12 @@ class HeartModel(BaseModel):
         data = data.copy()
         thresholds = self.metadata.get('grouped_features_tresholds', {})
         feature_groups = self.metadata.get('features_groups', {})
+        if not feature_groups:
+            raise ValueError("Metadata must contain 'features_groups'")
+        if not thresholds:
+            raise ValueError("Metadata must contain 'grouped_features_tresholds'")
         
         # grouped feature `antrophometric_score`
-        print("Proceeding with antrophometric_score")
         if 'antrophometric_score' in feature_groups:
             bmi_thresh = thresholds.get('bmi', 0.5)
             age_thresh = thresholds.get('age', 0.4)
@@ -81,7 +86,6 @@ class HeartModel(BaseModel):
                 data['obesity'] +
                 (data['age'] > age_thresh).astype(int)
             )
-        print("Proceeding with lifestyle_score")
         # grouped feature `lifestyle_score`
         if 'lifestyle_score' in feature_groups:
             stress_thresh = thresholds.get('stress_level', 7)
@@ -101,7 +105,6 @@ class HeartModel(BaseModel):
             )
         
         # grouped feature `test_score`
-        print("Proceeding with test_score")
         if 'test_score' in feature_groups:
             chol_thresh = thresholds.get('cholesterol', 0.5)
             trig_thresh = thresholds.get('triglycerides', 0.5)
@@ -114,7 +117,6 @@ class HeartModel(BaseModel):
             )
         
         # grouped feature `medical_score`
-        print("Proceeding with medical_score")
         if 'medical_score' in feature_groups:
             data['medical_score'] = (
                 data['medication_use'] +
@@ -136,3 +138,38 @@ class HeartModel(BaseModel):
             'prediction': prediction
         })
         return result
+    
+    def get_treshold(self) -> float:
+        """Get the treshold from model"""
+        return self.threshold
+    
+    def set_treshold(self, threshold: int) -> float:
+        """Sets new treshold to the model"""
+        self.threshold = threshold
+        return self.threshold
+    
+    def predict(self, input_data: Union[dict, pd.DataFrame]) -> dict:
+        """Predict heart attack risk with custom threshold -- overloaded from BaseModel"""
+        try:
+            if not self.is_loaded:
+                self.load_model()
+        
+            # convert dict to pandas df
+            if isinstance(input_data, dict):
+                data = pd.DataFrame([input_data])
+            else:
+                data = input_data.copy()
+        
+            # validate data
+            if not self._validate_input(data):
+                raise ValueError("Invalid data!")
+        
+            # perform data preprocessing
+            processed_data = self._preprocess_features(data)
+
+            # get probabilities and apply custom threshold
+            proba = self.model.predict_proba(processed_data)[:, 1]
+            pred = (proba > self.threshold).astype(int)
+            return 'success', self._format_output(pred, proba)
+        except Exception as e:
+            return 'error', str(e)

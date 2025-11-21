@@ -38,13 +38,7 @@ async def perform_prediction(file: UploadFile):
     data = pd.read_csv(csv_data)
 
     app_logger.info(f"Loaded DataFrame with shape: {data.shape}")
-<<<<<<< HEAD
-    app_logger.info(f"DataFrame dtypes: {data.dtypes}")
-    app_logger.info(f"DataFrame sample: {data.head().to_dict()}")
-#   status, result = model.predict(data)
-=======
     status, result = model.predict(data)
->>>>>>> e580760302233cba7e1d99602582d634b479b73d
 
 #   if status == 'success':
 #          # save output result

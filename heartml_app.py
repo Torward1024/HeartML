@@ -1,6 +1,6 @@
 from fastapi import FastAPI, UploadFile
 from fastapi.staticfiles import StaticFiles
-#from heart_model import HeartModel
+from heart_model import HeartModel
 
 import pandas as pd
 import uvicorn
@@ -20,8 +20,8 @@ app_handler.setFormatter(app_formatter)
 app_logger.addHandler(app_handler)
 
 app_logger.info(f'Initializing model...')
-#model = HeartModel('model/model_complete.pkl')
-#model.load_model()
+model = HeartModel('model/model_complete.pkl')
+model.load_model()
 app_logger.info("Model loaded successfully")
 app_logger.info(f"Using treshold={model.get_treshold()}")
 
@@ -40,19 +40,19 @@ async def perform_prediction(file: UploadFile):
     app_logger.info(f"Loaded DataFrame with shape: {data.shape}")
     status, result = model.predict(data)
 
-#   if status == 'success':
-#          # save output result
-#          output_path = "output/result.csv"
-#          result.to_csv(output_path, index=False)
-#          app_logger.info(f"Predictions saved to {output_path}")
-#         
-#          return {
-#              "status": "success", 
-#                "message": f"Predictions saved to {output_path}",
-#                "predictions_count": len(result)
-#          }
-#  else:
-#          return {"status": "error", "message": result}
+    if status == 'success':
+            # save output result
+            output_path = "output/result.csv"
+            result.to_csv(output_path, index=False)
+            app_logger.info(f"Predictions saved to {output_path}")
+            
+            return {
+                "status": "success", 
+                    "message": f"Predictions saved to {output_path}",
+                    "predictions_count": len(result)
+            }
+    else:
+            return {"status": "error", "message": result}
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
